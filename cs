@@ -134,7 +134,7 @@ case "$1" in
     cd $PATH/servers
     soubory=`ls |grep $2$`
     for i in $soubory; do
-    start($i)
+      start($i)
     done
 		;;
 	stop)
@@ -142,7 +142,7 @@ case "$1" in
     cd $PATH/servers
     soubory=`ls |grep $2$`
     for i in $soubory; do
-    stop($i)
+      stop($i)
     done
 		;;
 	restart)
@@ -150,9 +150,9 @@ case "$1" in
     cd $PATH/servers
     soubory=`ls |grep $2$`
     for i in $soubory; do
-    stop($i)
-    sleep 5
-    start($i)
+      stop($i)
+      sleep 5
+      start($i)
     done
 		;;
 	status)
@@ -160,7 +160,7 @@ case "$1" in
     cd $PATH/servers
     soubory=`ls |grep $2$`
     for i in $soubory; do
-    is_running($i)
+      is_running($i)
     done
 		;;
   menu)
@@ -182,7 +182,7 @@ case "$1" in
       echo -en "\033[u"
       echo -en "\033[14A"
       tput ed
-      bolean=false
+      bolean=1
     else
       echo "Option $option doesn't exist!"
       sleep 5
