@@ -24,7 +24,7 @@
 # Loads config file
 PATH=$PWD
 CD $PATH
-if [ ! -d servers]
+if [ ! -d servers ]
 then
     echo "Creating dir servers"
     mkdir servers
@@ -128,6 +128,30 @@ main_menu() {
   echo "              4) Exit"
   echo "Enter your option: "
 }
+list_servers() {
+  cd $PATH/servers
+  while [ $bolean ] do
+      echo -en "\033[u"
+      echo "              0) Exit"
+      soubory=`ls |grep $2$`
+      for i in $soubory; do
+        source `readlink -e $0 | sed "s:[^/]*$:$id:"`
+        echo "              $i) $NAME"
+      done
+      echo "Enter your option: "
+      read option
+      if [ "$option" == "0" ]; than
+        echo -en "\033[u"
+        tput ed
+        bolean=flse
+      elif [ -f $option ]; than
+        server_edit($option)
+      else
+        echo "Option $option doesn't exist!"
+        sleep 5
+      fi  
+  done
+}
 case "$1" in
   start)
     # Starts the server
@@ -167,25 +191,27 @@ case "$1" in
 		# Shows menu
     echo -en "\033[s"
     while [ $bolean ] do
-    echo -en "\033[u"
-    main_menu()
-    read option
-    if [ "$option" == "1" ]; than
-      list_servers()
-    elif [ "$option" == "2" ]; than
-      new_server()
-    elif [ "$option" == "3" ]; than
-      rm_server()
-    elif [ "$option" == "4" ]; than
-      echo "Good Bay.."
-      sleep 5
       echo -en "\033[u"
-      echo -en "\033[14A"
-      tput ed
-      bolean=1
-    else
-      echo "Option $option doesn't exist!"
-      sleep 5
+      main_menu()
+      read option
+      if [ "$option" == "1" ]; than
+       echo -en "\033[u"
+       list_servers()
+      elif [ "$option" == "2" ]; than
+       new_server()
+      elif [ "$option" == "3" ]; than
+        rm_server()
+      elif [ "$option" == "4" ]; than
+        echo "Good Bay..."
+        sleep 5
+        echo -en "\033[u"
+        echo -en "\033[14A"
+        tput ed
+        bolean=flse
+      else
+        echo "Option $option doesn't exist!"
+        sleep 5
+      fi
     done
     
 		;;
