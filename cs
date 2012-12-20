@@ -14,22 +14,18 @@
 # Short-Description:    Counter-strike server
 # Description:    Init script for Counter-strike server.
 ### END INIT INFO
-
-# Created by Floriusin
-
-# Pre-Based on https://github.com/Ahtenus/minecraft-init
-# Based on https://github.com/BrnoPCmaniak/WOW-init.d-script
-# Updates on https://github.com/BrnoPCmaniak/CS-init.d-script
+##################################################################
+# Created by Floriusin                                           #
+##################################################################
+# Pre-Based on https://github.com/Ahtenus/minecraft-init         #
+# Based on https://github.com/BrnoPCmaniak/WOW-init.d-script     #
+# Updates on https://github.com/BrnoPCmaniak/CS-init.d-script    #
+##################################################################
+# Config                                                         #
+  USERNAME="root"                                                #
+##################################################################
 
 # Loads config file
-PATH=$PWD
-as_user "cd $PATH"
-if [ ! -d servers ]
-then
-    echo "Creating dir servers"
-    as_user "mkdir servers"
-fi
-
 #if [ -L $0 ]
 #then
 #        source `readlink -e $0 | sed "s:[^/]*$:config:"`
@@ -52,13 +48,21 @@ as_user() {
                 su $USERNAME -s /bin/bash -c "$1"
         fi
 }
+PATH=$PWD
+as_user "cd $PATH"
+if [ ! -d servers ]
+then
+    echo "Creating dir servers"
+    as_user "mkdir servers"
+fi
 is_running($port) {
         # Checks for the world server screen session
         # returns true if it exists.
         lsof -i:$port > /dev/null && return 0
         lsof -i:$port > /dev/null || return 1
 }
-start($port) {
+start($1) {
+  port=$1
   cd $PATH/servers
   source `readlink -e $0 | sed "s:[^/]*$:$port:"`
 	cd $SERVPATH
@@ -81,7 +85,8 @@ start($port) {
 	done	
 	echo -e "Server \"$NAME\" on port $port is running.                 [  \033[0;32mOK\033[0m  ]"
 }
-stop($port) {
+stop($1) {
+  port=$1
   cd $PATH/servers
   source `readlink -e $0 | sed "s:[^/]*$:$port:"`
 	as_user "screen -p 0 -S $SCREEN -X eval 'stuff \"^C\"\015'"
@@ -105,7 +110,8 @@ stop($port) {
 	done	
 	echo -e "Server \"$NAME\" on port $port is now shut down.   [  \033[0;32mOK\033[0m  ]"
 }
-list($port) {
+list($1) {
+  port=$1
   cd $PATH/servers
   source `readlink -e $0 | sed "s:[^/]*$:$port:"`
   echo -e "On port $port is server with name \"$NAME\" \n"
