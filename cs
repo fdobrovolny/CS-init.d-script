@@ -23,11 +23,11 @@
 
 # Loads config file
 PATH=$PWD
-CD $PATH
+as_user "cd $PATH"
 if [ ! -d servers ]
 then
     echo "Creating dir servers"
-    mkdir servers
+    as_user "mkdir servers"
 fi
 
 #if [ -L $0 ]
@@ -52,7 +52,7 @@ as_user() {
                 su $USERNAME -s /bin/bash -c "$1"
         fi
 }
-is_running($port){
+is_running($port) {
         # Checks for the world server screen session
         # returns true if it exists.
         lsof -i:$port > /dev/null && return 0
@@ -60,7 +60,7 @@ is_running($port){
 }
 start($port) {
   cd $PATH/servers
-  source `readlink -e $0 | sed "s:[^/]*$:$id:"`
+  source `readlink -e $0 | sed "s:[^/]*$:$port:"`
 	cd $SERVPATH
 	as_user "cd $SERVERPATH && screen -dmS $SCREEN $INVOCATION"
 	# Waiting for the server to start
@@ -105,52 +105,35 @@ stop($port) {
 	done	
 	echo -e "Server \"$NAME\" on port $port is now shut down.   [  \033[0;32mOK\033[0m  ]"
 }
-logo() {
-  echo -e "\n
-        CS init.d script v 1.0 made by Floriusin"
-  echo "   ___                       _                       ___   _           _   _"
-  echo "  / __|  ___   _  _   _ _   | |_   ___   _ _   ___  / __| | |_   _ _  (_) | |__  ___"
-  echo " | (__  / _ \ | || | | ' \  |  _| / -_) | '_| |___| \__ \ |  _| | '_| | | | / / / -_)"
-  echo "  \___| \___/  \_,_| |_||_|  \__| \___| |_|         |___/  \__| |_|   |_| |_\_\ \___|"
-  echo "  ___          _   _            _                     _          _"
-  echo " |_ _|  _ _   (_) | |_       __| |    ___  __   _ _  (_)  _ __  | |_"
-  echo "  | |  | ' \  | | |  _|  _  / _\` |   (_-< / _| | '_| | | | '_ \ |  _|"
-  echo " |___| |_||_| |_|  \__| (_) \__,_|   /__/ \__| |_|   |_| | .__/  \__|"
-  echo "                                                         |_|"
-  echo "  ___   ___   ___   ___   ___   ___   ___   ___   ___   ___   ___   ___   ___   ___   ___"
-  echo " |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___| |___|"
-  echo -e "\n"
-}
-main_menu() {
-  echo "              1) List of Servers"
-  echo "              2) New Server"
-  echo "              3) Remove Server"
-  echo "              4) Exit"
-  echo "Enter your option: "
-}
-list_servers() {
+list($port) {
   cd $PATH/servers
-  while [ $bolean ] do
-      echo -en "\033[u"
-      echo "              0) Exit"
-      soubory=`ls |grep $2$`
-      for i in $soubory; do
-        source `readlink -e $0 | sed "s:[^/]*$:$id:"`
-        echo "              $i) $NAME"
-      done
-      echo "Enter your option: "
-      read option
-      if [ "$option" == "0" ]; than
-        echo -en "\033[u"
-        tput ed
-        bolean=flse
-      elif [ -f $option ]; than
-        server_edit($option)
-      else
-        echo "Option $option doesn't exist!"
-        sleep 5
-      fi  
-  done
+  source `readlink -e $0 | sed "s:[^/]*$:$port:"`
+  echo -e "On port $port is server with name \"$NAME\" \n"
+}
+create() {
+  cd $PATH/servers
+  echo -e "Enter name of server"
+  read $name
+  echo -e "Enter port of server with name $NAME"
+  read $port
+  echo -e "Enter path of directory with server(main folder) use something like \"\\opt\\cs\\016\" not \"\\opt\\cs\\016\\cstrike\""
+  read $serverpath
+  touch $port
+  echo -e "###############################################\n"
+  echo -e "# Config file of server on port $port         #\n"
+  echo -e "###############################################\n"
+  echo -e "#port\n"
+  echo -e "PORT=$port \n"
+  echo -e "#name\n"
+  echo -e "NAME=$name \n"
+  echo -e "#server path\n"
+  echo -e "SERVERPATH=$serverpath \n"
+  source `readlink -e $0 | sed "s:[^/]*$:$port:"`
+  if [ $PORT == $port && $NAME == $name && $SERVERPATH == $serverpath ] ; then
+    echo "Server suceful created"
+  else
+    echo "Sorry somewhere is error"
+  fi
 }
 case "$1" in
   start)
@@ -187,33 +170,13 @@ case "$1" in
       is_running($i)
     done
 		;;
-  menu)
-		# Shows menu
-    echo -en "\033[s"
-    while [ $bolean ] do
-      echo -en "\033[u"
-      main_menu()
-      read option
-      if [ "$option" == "1" ]; than
-       echo -en "\033[u"
-       list_servers()
-      elif [ "$option" == "2" ]; than
-       new_server()
-      elif [ "$option" == "3" ]; than
-        rm_server()
-      elif [ "$option" == "4" ]; than
-        echo "Good Bay..."
-        sleep 5
-        echo -en "\033[u"
-        echo -en "\033[14A"
-        tput ed
-        bolean=flse
-      else
-        echo "Option $option doesn't exist!"
-        sleep 5
-      fi
+  list)
+    # Lists servers
+    cd $PATH/servers
+    soubory=`ls |grep $2$`
+    for i in $soubory; do
+      list($i)
     done
-    
 		;;
 	help|--help|-h)
 		echo "Usage: $0 COMMAND"
