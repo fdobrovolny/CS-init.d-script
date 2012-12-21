@@ -55,7 +55,7 @@ then
     echo "Creating dir servers"
     as_user "mkdir servers"
 fi
-is_running($port) {
+is_running($1) {
         # Checks for the world server screen session
         # returns true if it exists.
         lsof -i:$port > /dev/null && return 0
